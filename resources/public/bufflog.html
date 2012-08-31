@@ -34,49 +34,56 @@
 
       // categorize
 
-      
+      newYear = function(a){
+        return "(year: "+a+")"
+      }
+      newMonth = function(a){
+        return "(month: "+a[0]+")"
+      }
+      newActivity = function(a){
+        return "(activity: "+a+")"
+      }
+      newDay = function(a){
+        return "(day: "+a+")"
+      }
+      newFood = function(a){
+        return "(food: ("+
+            " name: "+a[3]+
+            " quantity: "+a[1]+
+            " unit:"+a[2]+
+            "))"
+      }
+      newExercise = function(a){
+        return "(exercise: ("+
+            " name: "+a[4]+
+            " weight: "+a[1]+
+            " unit: "+"lbs"+
+            " reps: "+a[2]+
+            " sets: "+a[3]+
+          "))"
+      }
+      newWeight = function(a){
+        return "(weight: "+a[1]+" unit: "+a[2]+")"
+      }
+
+      regex_matches = {
+        "^[0-9]{4}$": newYear
+        ,"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$": newMonth
+        ,"^[a-zA-Z]+$": newActivity
+        ,"^[0-9]{2}$": newDay
+        ,"^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$": newFood
+        ,"^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$": newExercise
+        ,"^([0-9]+)(lb|kg)": newWeight
+      }
 
       $.each($("#input").html().split("\n"), function(){
-        output = ""
-        if(match = this.match(/^[0-9]{4}$/)){
-          output += "(year: "+match+")"
-
-          // add new year to root
-        }
-        if (match = this.match(/^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$/i)){
-          output += "(month: "+match[0]+")"
-        }
-        else if (match = this.match(/^[a-zA-Z]+$/)){
-          output += "(activity: "+match+")"
-        }
-        if (match = this.match(/^[0-9]{2}$/)){
-          output += "(day: "+match+")"
-
-          // add new day to last month
-        }
-        if (match = this.match(/^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$/)){
-          output += "(food: ("+
-            " name: "+match[3]+
-            " quantity: "+match[1]+
-            " unit:"+match[2]+
-            "))"
-          //FIXME: find quantity and food
+        for(var regex in regex_matches){
+          if(m = this.match(RegExp(regex,"i"))){
+            $("#processed").append((regex_matches[regex])(m)+"\n")
+            break;
+          }
         }
 
-        if (match = this.match(/^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$/)){
-          output += "(exercise: ("+
-            " name: "+match[4]+
-            " weight: "+match[1]+
-            " unit: "+"lbs"+
-            " reps: "+match[2]+
-            " sets: "+match[3]+
-          "))"
-        }
-        if (match = this.match(/^([0-9]+)(lb|kg)/)){
-          output += "(weight: "+match[1]+" unit: "+match[2]+")"
-        }
-
-        $("#processed").append(output+"\n")
       });
 
       // analysis
