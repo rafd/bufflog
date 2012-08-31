@@ -17,6 +17,7 @@
   </style>
   <!--<script type="text/javascript" src="js/main.js"></script>-->
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+  <script type="text/javascript" src="js/jquery.sparkline.min.js"></script>
   <script type="text/javascript">
     /*
       year
@@ -92,6 +93,21 @@
 
       $("#analysis").append(analysis)
 
+
+      // sparklines
+
+      //http://omnipotent.net/jquery.sparkline/#s-docs
+
+      charts = ["weight","food","calories","carbs","derps","squat","press","bench","dead"]
+
+      for(chart in charts){
+        $("#charts").append(charts[chart])
+        spark = $("<span></span>")
+        $("#charts").append(spark)
+        spark.sparkline([Math.random(), Math.random(), Math.random(), Math.random(), Math.random(), Math.random()],{type: 'bar'})
+        $("#charts").append(Math.floor(100*Math.random())+"<br/>")
+
+      }
 
     });
   </script>
@@ -191,5 +207,6 @@ snack
 
 <textarea id="processed"></textarea>
 <textarea id="analysis"></textarea>
+<div id="charts"></div>
 </body>
 </html>
