@@ -58,14 +58,6 @@
     */
 
 
-    /*
-      year
-        month
-          day
-            activity
-              food|exercise
-
-    */
     $(function(){
 
       // helper functions
@@ -87,7 +79,7 @@
         localStorage.clear();
       }
 
-
+      // catch #input events
 
       $('#input').bind({
         // on keyup, re-scan current line
@@ -108,9 +100,6 @@
         }
       });
 
-      // replace content w/ localstorage
-      $("#input").html(localStorage.getItem('input') || "<div><br /></div>")
-
       var processAll = function() {
         $("#input div").each(function(){       
           processLine(this);
@@ -126,16 +115,29 @@
 
         delay(function(){
 
-          // print JSON stringified data to #processed
-          $("#processed").html("")
-          $("#input div").each(function(){ 
-            $("#processed").append("<div>"+(JSON.stringify(lineToData($(this).text())) || "&nbsp;")+"</div>")
-          });
+          crunchAllData();
 
           // save content to local storage
           localStorage.setItem('input', $('#input').html());
           
         }, 500);
+      }
+
+      var crunchAllData = function(){
+        // print JSON stringified data to #processed
+        $("#processed").html("")
+        $("#input div").each(function(){ 
+          $("#processed").append("<div>"+(JSON.stringify(lineToData($(this).text())) || "&nbsp;")+"</div>")
+        });
+
+        /*
+          year
+            month
+              day
+                activity
+                  food|exercise
+
+        */
       }
 
       var lineToData = function(inputText) {
@@ -184,6 +186,12 @@
       }
 
   
+      // run
+
+      // replace content w/ localstorage
+      $("#input").html(localStorage.getItem('input') || "<div><br /></div>")
+
+      crunchAllData();
 
       // sparklines
 
