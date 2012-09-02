@@ -45,7 +45,6 @@
     BUGS:
       possible to delete everything if backspace at top
 
-
     */
 
 
@@ -77,14 +76,13 @@
 
       $('#input').bind({
         // on keyup, re-scan current line
-        // BUG: if move cursor down/up, skips analysis of previous lines
-        //     need to mark lines as "edited" to rescan
-        keyup: function(){
+        keyup: function(e){
           selection = window.getSelection()
           activeLineDiv = selection.baseNode.nodeName == "#text" ? selection.baseNode.parentNode : selection.baseNode
           
           processLine(activeLineDiv);
         },
+        keydown: function(){ $(this).keyup(); }, // also trigger on keydown, to avoid issues with quick typing
         // on paste, re-scan entire text
         paste: function(){
           $("#input").html("<div></div>"); // prevents nested divs
@@ -114,7 +112,7 @@
       }
 
       var lineToData = function(inputText) {
-        
+
         regex_matches = {
           "^[0-9]{4}$": function(a){
             return { year: a[0] }
