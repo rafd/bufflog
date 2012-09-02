@@ -83,6 +83,11 @@
           return Object.keys(a)[0]
       };
 
+      var clear = function(){
+        localStorage.clear();
+      }
+
+
 
       $('#input').bind({
         // on keyup, re-scan current line
@@ -95,28 +100,40 @@
         keydown: function(){ $(this).keyup(); }, // also trigger on keydown, to avoid issues with quick typing
         // on paste, re-scan entire text
         paste: function(){
-          $("#input").html("<div></div>"); // prevents nested divs
+          console.log('pasting!')
+          $(this).html("<div></div>"); // prevents nested divs
           setTimeout(function(){ // timeout needed to run function after paste occurs
-            $("#input div").each(function(){
-              processLine(this);
-            });
+            processAll();
           }, 0);
         }
       });
 
+      // replace content w/ localstorage
+      $("#input").html(localStorage.getItem('input') || "<div><br /></div>")
+
+      var processAll = function() {
+        $("#input div").each(function(){       
+          processLine(this);
+        });
+      }
 
       var processLine = function(activeDivLine){
+
         data = lineToData($(activeDivLine).text());
 
         // attach css class corresponding to data class
         $(activeDivLine).attr("class", getType(data) || "")
 
         delay(function(){
-          $("#processed").html("")
 
+          // print JSON stringified data to #processed
+          $("#processed").html("")
           $("#input div").each(function(){ 
             $("#processed").append("<div>"+JSON.stringify(lineToData($(this).text()))+"</div>")
           });
+
+          // save content to local storage
+          localStorage.setItem('input', $('#input').html());
           
         }, 500);
       }
@@ -187,7 +204,7 @@
   </script>
 </head>
 <body>
-<div id="input" class="space editable" contentEditable="true"><div><br/></div></div>
+<div id="input" class="space editable" contentEditable="true"></div>
 <div id="processed" class="space" ></div>
 <div id="charts" class="space" ></div>
 </body>
