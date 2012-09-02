@@ -15,12 +15,10 @@
   }
   #processed {
     width: 40%;
+    white-space: nowrap;
   }
   #analysis {
     width: 30%;
-  }
-  .red {
-    color: red;
   }
   #input div:before {
     display: inline-block;
@@ -28,6 +26,7 @@
     border-radius: 2px;
     color: blue;
     width: 125px;
+    height: 1em;
     margin-left: -130px;
     text-align: right;
     padding-right: 5px;
@@ -57,10 +56,6 @@
             activity
               food|exercise
 
-
-
-
-
     */
     $(function(){
 
@@ -79,7 +74,6 @@
           return Object.keys(a)[0]
       };
 
-    
 
       $('#input').bind({
         // on keyup, re-scan current line
@@ -90,99 +84,78 @@
           activeLineDiv = selection.baseNode.nodeName == "#text" ? selection.baseNode.parentNode : selection.baseNode
           
           processLine(activeLineDiv);
-
-          delay(function(){
-            // some other processing to be delayed
-          }, 500);
         },
         // on paste, re-scan entire text
         paste: function(){
           $("#input").html("<div></div>"); // prevents nested divs
-          setTimeout(function(){
+          setTimeout(function(){ // timeout needed to run function after paste occurs
             $("#input div").each(function(){
               processLine(this);
             });
-          }, 0)
+          }, 0);
         }
       });
 
-      // on paste, re-scan entire input
-      var rescan = function() {
-        $('#processed').html("")
-        //...
-
-        $("#input div").each(function(){
-          for(var regex in regex_matches){
-            if(m = $(this).text().match(RegExp(regex,"i"))){
-              $("#processed").append((regex_matches[regex])(m))
-              break;
-            } 
-          }
-          $("#processed").append("<br />")
-        });
-      }
-
-
-
 
       var processLine = function(activeDivLine){
-        $(activeDivLine).attr("class", getType(lineToData($(activeDivLine).text())) || "")
+        data = lineToData($(activeDivLine).text());
+
+        // attach css class corresponding to data class
+        $(activeDivLine).attr("class", getType(data) || "")
+
+        delay(function(){
+          $("#processed").html("")
+
+          $("#input div").each(function(){ 
+            $("#processed").append("<div>"+JSON.stringify(lineToData($(this).text()))+"</div>")
+          });
+          
+        }, 500);
       }
 
       var lineToData = function(inputText) {
         
-        // categorize
-
-        newYear = function(a){
-          return { year: a }
-        }
-        newMonth = function(a){
-          return { month: a[0] }
-        }
-        newActivity = function(a){
-          return { activity: a }
-        }
-        newDay = function(a){
-          return { day: a }
-        }
-        newFood = function(a){
-          return { food: 
-            {
-              name: a[3],
-              mass: { quantity: a[1], unit: a[2] }
-            }
-          }
-        }
-        newExercise = function(a){
-          return { exercise: 
-            {
-              name: a[4],
-              mass: { quantity: a[1], unit: "lbs" },
-              reps: a[2],
-              sets: a[3]
-            }
-          }
-        }
-        newBodyMass = function(a){
-          return { bodyMass: { mass: { quantity: a[1], unit: a[2] } } }
-        }
-
         regex_matches = {
-          "^[0-9]{4}$": newYear
-          ,"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$": newMonth
-          ,"^[a-zA-Z]+$": newActivity
-          ,"^[0-9]{2}$": newDay
-          ,"^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$": newFood
-          ,"^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$": newExercise
-          ,"^([0-9]+)(lb|kg)": newBodyMass
+          "^[0-9]{4}$": function(a){
+            return { year: a[0] }
+          }
+          ,"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$": function(a){
+            return { month: a[0] }
+          }
+          ,"^[a-zA-Z]+$": function(a){
+            return { activity: a[0] }
+          }
+          ,"^[0-9]{2}$": function(a){ 
+            return { day: a[0] }
+          }
+          ,"^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$": function(a){
+            return { food: 
+              {
+                name: a[3],
+                mass: { quantity: a[1], unit: a[2] }
+              }
+            }
+          }
+          ,"^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$": function(a){
+            return { exercise: 
+              {
+                name: a[4],
+                mass: { quantity: a[1], unit: "lbs" },
+                reps: a[2],
+                sets: a[3]
+              }
+            }
+          }
+          ,"^([0-9]+)(lb|kg)": function(a){ 
+            return { bodyMass: { mass: { quantity: a[1], unit: a[2] } } } 
+          }
         }
 
         for(var regex in regex_matches){
           if(m = inputText.match(RegExp(regex,"i"))){
             return (regex_matches[regex])(m)
           } 
-        }
-        
+        } 
       }
 
       
