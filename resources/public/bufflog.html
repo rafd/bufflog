@@ -69,20 +69,32 @@
           return Object.keys(a)[0]
       };
 
-      // on enter, remove class from div
+    
 
-      // on key release, re-scan current line
-      //BUG: if move cursor down/up, skips analysis of previous lines
-      //     need to mark lines as "edited" to rescan
-
-      $('#input').keyup(function() {
-        
+      $('#input').bind({
+        // on keyup, re-scan current line
+        // BUG: if move cursor down/up, skips analysis of previous lines
+        //     need to mark lines as "edited" to rescan
+        keyup: function(){
           selection = window.getSelection()
           activeLineDiv = selection.baseNode.nodeName == "#text" ? selection.baseNode.parentNode : selection.baseNode
           
           processLine(activeLineDiv);
 
-        });
+          delay(function(){
+            // some other processing to be delayed
+          }, 500);
+        },
+        // on paste, re-scan entire text
+        paste: function(){
+          $("#input").html("<div></div>"); // prevents nested divs
+          setTimeout(function(){
+            $("#input div").each(function(){
+              processLine(this);
+            });
+          }, 0)
+        }
+      });
 
       // on paste, re-scan entire input
       var rescan = function() {
