@@ -1,22 +1,27 @@
 <html>
 <head>
   <style type="text/css">
-  textarea {
+  .space {
     font-family: monospace;
     height: 100%;
+    float: left;
+  }
+  .editable {
+    background: #eee;
   }
   #input {
     width: 15%;
   }
   #processed {
-    width: 30%;
+    width: 40%;
   }
   #analysis {
     width: 30%;
   }
   </style>
   <!--<script type="text/javascript" src="js/main.js"></script>-->
-  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>
+  <!--<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js"></script>-->
+  <script type="text/javascript" src="js/jquery.min.js"></script>
   <script type="text/javascript" src="js/jquery.sparkline.min.js"></script>
   <script type="text/javascript">
     /*
@@ -32,60 +37,84 @@
 
     */
     $(function(){
+      //on key release, re-scan entire
 
-      // categorize
+      var delay = (function(){
+        var timer = 0;
+        return function(callback, ms){
+          clearTimeout (timer);
+          timer = setTimeout(callback, ms);
+        };
+      })();
 
-      newYear = function(a){
-        return "(year: "+a+")"
+      $('#input').keyup(function() {
+        delay(scan, 200);
+      });
+
+      var scasn = function(){
+        //$("#input").html($('#input').html().replace(/<div>/gi,'<br>').replace(/<\/div>/gi,''));
+        $('#processed').text($('#input').html())
       }
-      newMonth = function(a){
-        return "(month: "+a[0]+")"
-      }
-      newActivity = function(a){
-        return "(activity: "+a+")"
-      }
-      newDay = function(a){
-        return "(day: "+a+")"
-      }
-      newFood = function(a){
-        return "(food: ("+
-            " name: "+a[3]+
-            " quantity: "+a[1]+
-            " unit:"+a[2]+
+
+      var scan = function() {
+        console.log('scanning!')
+        $('#processed').html("")
+        // categorize
+
+        newYear = function(a){
+          return "(year: "+a+")"
+        }
+        newMonth = function(a){
+          return "(month: "+a[0]+")"
+        }
+        newActivity = function(a){
+          return "(activity: "+a+")"
+        }
+        newDay = function(a){
+          return "(day: "+a+")"
+        }
+        newFood = function(a){
+          return "(food: ("+
+              " name: "+a[3]+
+              " quantity: "+a[1]+
+              " unit:"+a[2]+
+              "))"
+        }
+        newExercise = function(a){
+          return "(exercise: ("+
+              " name: "+a[4]+
+              " weight: "+a[1]+
+              " unit: "+"lbs"+
+              " reps: "+a[2]+
+              " sets: "+a[3]+
             "))"
-      }
-      newExercise = function(a){
-        return "(exercise: ("+
-            " name: "+a[4]+
-            " weight: "+a[1]+
-            " unit: "+"lbs"+
-            " reps: "+a[2]+
-            " sets: "+a[3]+
-          "))"
-      }
-      newWeight = function(a){
-        return "(weight: "+a[1]+" unit: "+a[2]+")"
-      }
-
-      regex_matches = {
-        "^[0-9]{4}$": newYear
-        ,"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$": newMonth
-        ,"^[a-zA-Z]+$": newActivity
-        ,"^[0-9]{2}$": newDay
-        ,"^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$": newFood
-        ,"^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$": newExercise
-        ,"^([0-9]+)(lb|kg)": newWeight
-      }
-
-      $.each($("#input").html().split("\n"), function(){
-        for(var regex in regex_matches){
-          if(m = this.match(RegExp(regex,"i"))){
-            $("#processed").append((regex_matches[regex])(m)+"\n")
-            break;
-          }
+        }
+        newWeight = function(a){
+          return "(weight: "+a[1]+" unit: "+a[2]+")"
         }
 
-      });
+        regex_matches = {
+          "^[0-9]{4}$": newYear
+          ,"^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-zA-Z]+$": newMonth
+          ,"^[a-zA-Z]+$": newActivity
+          ,"^[0-9]{2}$": newDay
+          ,"^([0-9\.]+)([a-zA-Z]*) ([a-zA-Z -]+)$": newFood
+          ,"^([0-9]+)x([0-9]+)x([0-9]) ([a-zA-Z]+)$": newExercise
+          ,"^([0-9]+)(lb|kg)": newWeight
+        }
+
+        $("#input div").each(function(){
+          for(var regex in regex_matches){
+            if(m = $(this).text().match(RegExp(regex,"i"))){
+              $("#processed").append((regex_matches[regex])(m))
+              break;
+            } 
+          }
+          $("#processed").append("<br />")
+        });
+      }
+
+      
 
       // analysis
 
@@ -113,100 +142,9 @@
   </script>
 </head>
 <body>
-<textarea id="input">
-2012
-August
-27
-135lbs
-breakfast
-40g holy crap 
-80g yogurt
-20g protein
-1c juice
-1 apple
-workout
-45x5x3 squat
-45x5x1 press
-45x4x1 press
-45x5x1 press
-45x5x1 deadlift
-lunch
-206g steak
-144g mushroom
-196g broccoli
-726mL oj
-snack
-10 sooshka
-100g cookie
-dinner
-120g nectarine
-40g tangerine
-206g steak
-252g chinese cabbage
-180g quinoa
-28
-breakfast
-118g pancake
-26g maple syrup
-112g nectarine
-60g banana
-74g cookie
-lunch
-220g steak
-58g quinoa
-170g salad
-52g protein
-dinner
-210g chicken fries
-152g broccoli
-238g quinoa
-29
-breakfast
-72g holy crap
-146g yogurt
-40g protein
-lunch
-80g broccoli
-60g chicken fries
-128g quinoa
-102g eggs
-129g ham
-dinner
-1 burrito
-supper
-58g tomato
-20g spinach
-37g ham
-1.5 apple
-30
-dinner
-436g watermelon
-0.25 apple
-148g scrambled egg
-30
-breakfast
-113g pancake
-50g protein powder
-74g orange
-216g pear
-lunch
-134g ham
-348g chinese cabbage
-34g quinoa
-1 pear
-dinner
-210g chinese cabbage
-82g ham
-284g rice
-110g tofu
-680g watermelon
-snack
-1 pear
-1 freezie
-</textarea>
-
-<textarea id="processed"></textarea>
-<textarea id="analysis"></textarea>
-<div id="charts"></div>
+<div id="input" class="space editable" contentEditable="true"><div><br/></div></div>
+<div id="processed" class="space" ></div>
+<div id="analysis" class="space" ></div>
+<div id="charts" class="space" ></div>
 </body>
 </html>
