@@ -129,7 +129,7 @@
           // print JSON stringified data to #processed
           $("#processed").html("")
           $("#input div").each(function(){ 
-            $("#processed").append("<div>"+JSON.stringify(lineToData($(this).text()))+"</div>")
+            $("#processed").append("<div>"+(JSON.stringify(lineToData($(this).text())) || "&nbsp;")+"</div>")
           });
 
           // save content to local storage
