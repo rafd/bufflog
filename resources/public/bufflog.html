@@ -1,6 +1,10 @@
 <html>
 <head>
   <style type="text/css">
+  body {
+    margin: 0;
+    padding: 0;
+  }
   .space {
     font-family: monospace;
     height: 100%;
@@ -14,11 +18,17 @@
     margin-left: 125px;
   }
   #processed {
-    width: 40%;
+    width: 30%;
     white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
   #analysis {
     width: 30%;
+  }
+  #charts {
+    width: 20%;
+    margin-left: 2%;
   }
   #input div:before {
     display: inline-block;
@@ -156,14 +166,7 @@
         } 
       }
 
-      
-
-      // analysis
-
-      analysis = "10/08/12 100g\n10/08/12 100g"
-
-      $("#analysis").append(analysis)
-
+  
 
       // sparklines
 
@@ -186,7 +189,6 @@
 <body>
 <div id="input" class="space editable" contentEditable="true"><div><br/></div></div>
 <div id="processed" class="space" ></div>
-<div id="analysis" class="space" ></div>
 <div id="charts" class="space" ></div>
 </body>
 </html>
